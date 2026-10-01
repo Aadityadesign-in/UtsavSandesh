@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>UtsavSandesh — Hindi Wishes & Festival Quotes</title>
+  <meta name="description" content="Hindi wishes, quotes, status and festival greetings on UtsavSandesh.">
+  <meta name="robots" content="index, follow">
+
+  <link rel="canonical" id="canonicalUrl" href="">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" id="ogTitle" content="UtsavSandesh">
+  <meta property="og:description" id="ogDescription" content="Hindi Wishes, Quotes & Festival Status">
+  <meta property="og:url" id="ogUrl" content="">
+  <meta property="og:site_name" content="UtsavSandesh">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" id="twitterTitle" content="UtsavSandesh">
+  <meta name="twitter:description" id="twitterDescription" content="Hindi Wishes, Quotes & Festival Status">
+
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .post-page {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 18px 80px;
+    }
+
+    .post-breadcrumb {
+      margin-bottom: 22px;
+      font-size: 14px;
+      opacity: .75;
+    }
+
+    .post-breadcrumb a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .post-detail {
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 24px;
+      padding: 30px;
+      backdrop-filter: blur(18px);
+    }
+
+    .post-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .post-tag {
+      display: inline-flex;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      font-size: 13px;
+    }
+
+    .post-detail h1 {
+      font-size: clamp(30px, 6vw, 52px);
+      line-height: 1.12;
+      margin: 10px 0 18px;
+    }
+
+    .post-excerpt {
+      font-size: 18px;
+      line-height: 1.7;
+      opacity: .82;
+      margin-bottom: 30px;
+    }
+
+    .post-content {
+      font-size: 18px;
+      line-height: 1.9;
+    }
+
+    .post-content p {
+      margin: 0 0 20px;
+    }
+
+    .post-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 35px;
+    }
+
+    .post-action {
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 18px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .post-loading,
+    .post-error {
+      text-align: center;
+      padding: 70px 20px;
+    }
+
+    .post-error h2 {
+      margin-bottom: 10px;
+    }
+
+    .back-home {
+      display: inline-block;
+      margin-top: 18px;
+      text-decoration: none;
+      padding: 11px 18px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.1);
+      color: inherit;
+    }
+
+    @media (max-width: 600px) {
+      .post-page {
+        padding: 25px 12px 60px;
+      }
+
+      .post-detail {
+        padding: 22px 18px;
+        border-radius: 18px;
+      }
+
+      .post-content {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="site-header">
+    <div class="container">
+      <a href="index.html" class="logo">Utsav<span>Sandesh</span></a>
+    </div>
+  </header>
+
+  <main class="post-page">
+
+    <div class="post-breadcrumb">
+      <a href="index.html">Home</a>
+      <span> / </span>
+      <span id="breadcrumbFestival">Post</span>
+    </div>
+
+    <div id="postContainer">
+
+      <div class="post-loading">
+        <h2>Post load ho raha hai...</h2>
+        <p>Please wait.</p>
+      </div>
+
+    </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>© 2026 UtsavSandesh. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+
+  <script>
+    const { createClient } = supabase;
+
+    const client = createClient(
+      window.SUPABASE_CONFIG.url,
+      window.SUPABASE_CONFIG.key
+    );
+
+    const params = new URLSearchParams(window.location.search);
+    const slug = params.get("slug");
+
+    const container = document.getElementById("postContainer");
+
+    function escapeHTML(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function formatContent(value) {
+      return escapeHTML(value)
+        .split(/\n\s*\n/)
+        .map(p => `<p>${p.replace(/\n/g, "<br>")}</p>`)
+        .join("");
+    }
+
+    function shareWhatsApp(title) {
+      const url = window.location.href;
+
+      const text =
+        `${title}\n\n` +
+        `पढ़ें: ${url}`;
+
+      window.open(
+        `https://wa.me/?text=${encodeURIComponent(text)}`,
+        "_blank"
+      );
+    }
+
+    async function copyPost() {
+      const text = document.getElementById("postText").innerText;
+
+      try {
+        await navigator.clipboard.writeText(text);
+        alert("Post copied successfully!");
+      } catch {
+        alert("Copy nahi ho paya.");
+      }
+    }
+
+    async function loadPost() {
+
+      if (!slug) {
+        showError("Post URL missing hai.");
+        return;
+      }
+
+      const { data, error } = await client
+        .from("posts")
+        .select("*")
+        .eq("slug", slug)
+        .eq("published", true)
+        .single();
+
+      if (error || !data) {
+        showError("Ye post available nahi hai.");
+        return;
+      }
+
+      renderPost(data);
+    }
+
+    function renderPost(post) {
+
+      const title = post.title || "UtsavSandesh";
+      const description =
+        post.excerpt ||
+        `${post.festival || "Festival"} ke Hindi wishes, quotes aur status.`;
+
+      const currentUrl = window.location.href;
+
+      document.title = `${title} | UtsavSandesh`;
+
+      document.querySelector('meta[name="description"]')
+        .setAttribute("content", description);
+
+      document.getElementById("canonicalUrl").href = currentUrl;
+
+      document.getElementById("ogTitle").content = title;
+      document.getElementById("ogDescription").content = description;
+      document.getElementById("ogUrl").content = currentUrl;
+
+      document.getElementById("twitterTitle").content = title;
+      document.getElementById("twitterDescription").content = description;
+
+      document.getElementById("breadcrumbFestival").textContent =
+        post.festival || "Post";
+
+      container.innerHTML = `
+        <article class="post-detail">
+
+          <div class="post-meta">
+            ${post.category
+              ? `<span class="post-tag">${escapeHTML(post.category)}</span>`
+              : ""}
+
+            ${post.festival
+              ? `<span class="post-tag">${escapeHTML(post.festival)}</span>`
+              : ""}
+
+            ${post.year
+              ? `<span class="post-tag">${escapeHTML(post.year)}</span>`
+              : ""}
+          </div>
+
+          <h1>${escapeHTML(title)}</h1>
+
+          <div class="post-excerpt">
+            ${escapeHTML(description)}
+          </div>
+
+          <div class="post-content" id="postText">
+            ${formatContent(post.content || "")}
+          </div>
+
+          <div class="post-actions">
+
+            <button
+              class="post-action"
+              onclick="copyPost()">
+              📋 Copy Post
+            </button>
+
+            <button
+              class="post-action"
+              onclick="shareWhatsApp(${JSON.stringify(title)})">
+              💬 WhatsApp Share
+            </button>
+
+            <a
+              href="index.html"
+              class="post-action">
+              ← Home
+            </a>
+
+          </div>
+
+        </article>
+      `;
+    }
+
+    function showError(message) {
+
+      container.innerHTML = `
+        <div class="post-error">
+          <h2>😕 Post nahi mila</h2>
+          <p>${escapeHTML(message)}</p>
+
+          <a href="index.html" class="back-home">
+            ← Homepage par jaayein
+          </a>
+        </div>
+      `;
+    }
+
+    loadPost();
+  </script>
+
+</body>
+</html>
