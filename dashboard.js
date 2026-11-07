@@ -1,454 +1,357 @@
+
 /* =========================================================
-   UTSAVSANDESH ADMIN
+   UTSAVSANDESH ADMIN DASHBOARD
+   Multiple Admin + Custom Festival + CRUD
    ========================================================= */
 
 let supabaseClient = null;
 let editingId = null;
 
-const $ = (id) =>
-  document.getElementById(id);
+const $ = (id) => document.getElementById(id);
 
-document.addEventListener(
-  "DOMContentLoaded",
-  async () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  initializeSupabase();
 
-    initializeSupabase();
-
-    if (!supabaseClient) {
-      showLoginMessage(
-        "config.js में Supabase credentials डालें।"
-      );
-      return;
-    }
-
-    setupEvents();
-
-    await checkSession();
-
+  if (!supabaseClient) {
+    showLoginMessage("config.js में Supabase Configuration जाँचें।");
+    return;
   }
-);
 
+  setupEvents();
+  await checkSession();
+});
 
 /* =========================================================
-   INITIALIZE
+   INITIALIZE SUPABASE
    ========================================================= */
 
 function initializeSupabase() {
+  const config = window.SUPABASE_CONFIG;
 
-  if (
-    !window.SUPABASE_CONFIG ||
-    !window.SUPABASE_CONFIG.url ||
-    !window.SUPABASE_CONFIG.key ||
-    window.SUPABASE_CONFIG.url.includes("YOUR_")
-  ) {
+  if (!config?.url || !config?.key || config.url.includes("YOUR_")) {
     return;
   }
 
-  if (!window.supabase) {
-    return;
-  }
+  if (!window.supabase) return;
 
-  supabaseClient =
-    window.supabase.createClient(
-      window.SUPABASE_CONFIG.url,
-      window.SUPABASE_CONFIG.key,
-      {
-        auth: {
-          persistSession: true,
-          autoRefreshToken: true,
-          detectSessionInUrl: true
-        }
+  supabaseClient = window.supabase.createClient(
+    config.url,
+    config.key,
+    {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
       }
-    );
+    }
+  );
 }
-
 
 /* =========================================================
    EVENTS
    ========================================================= */
 
 function setupEvents() {
+  $("loginForm")?.addEventListener("submit", login);
+  $("logoutBtn")?.addEventListener("click", logout);
+  $("postForm")?.addEventListener("submit", savePost);
+  $("resetBtn")?.addEventListener("click", resetForm);
 
-  $("loginForm")
-    ?.addEventListener(
-      "submit",
-      login
-    );
-
-  $("logoutBtn")
-    ?.addEventListener(
-      "click",
-      logout
-    );
-
-  $("postForm")
-    ?.addEventListener(
-      "submit",
-      savePost
-    );
-
-  $("resetBtn")
-    ?.addEventListener(
-      "click",
-      resetForm
-    );
-
+  $("festival")?.addEventListener("change", handleFestivalChange);
 }
 
+/* =========================================================
+   CUSTOM FESTIVAL
+   ========================================================= */
+
+function handleFestivalChange() {
+  const festival = $("festival");
+  const customInput = $("customFestival");
+
+  if (!festival || !customInput) return;
+
+  const isCustom = festival.value === "__custom__";
+
+  customInput.classList.toggle("hidden", !isCustom);
+  customInput.required = isCustom;
+
+  if (!isCustom) {
+    customInput.value = "";
+  } else {
+    customInput.focus();
+  }
+}
+
+function getFestivalValue() {
+  const selected = $("festival").value;
+
+  if (selected === "__custom__") {
+    return $("customFestival").value.trim();
+  }
+
+  return selected;
+}
+
+function setFestivalValue(value) {
+  const festival = $("festival");
+  const customInput = $("customFestival");
+
+  const exists = Array.from(festival.options)
+    .some(option => option.value === value);
+
+  if (exists && value !== "__custom__") {
+    festival.value = value;
+    customInput.value = "";
+    customInput.classList.add("hidden");
+    customInput.required = false;
+  } else {
+    festival.value = "__custom__";
+    customInput.value = value || "";
+    customInput.classList.remove("hidden");
+    customInput.required = true;
+  }
+}
 
 /* =========================================================
    SESSION
    ========================================================= */
 
 async function checkSession() {
+  const { data, error } = await supabaseClient.auth.getSession();
 
-  const {
-    data
-  } = await supabaseClient
-    .auth
-    .getSession();
-
-  if (
-    data &&
-    data.session
-  ) {
-
-    const isAdmin =
-      await verifyAdmin(
-        data.session.user.id
-      );
-
-    if (isAdmin) {
-
-      showDashboard(
-        data.session.user
-      );
-
-      await loadAdminPosts();
-
-    } else {
-
-      await supabaseClient
-        .auth
-        .signOut();
-
-      showLoginMessage(
-        "इस account को admin access नहीं मिला।"
-      );
-
-    }
-
+  if (error) {
+    showLoginMessage("Session जाँच नहीं हो सकी। दोबारा Login करें।");
+    return;
   }
 
-}
+  if (data?.session) {
+    const user = data.session.user;
+    const isAdmin = await verifyAdmin(user.id);
 
+    if (isAdmin) {
+      showDashboard(user);
+      await loadAdminPosts();
+    } else {
+      await supabaseClient.auth.signOut();
+      showLoginMessage("इस Account को Admin Access नहीं मिला।");
+    }
+  }
+}
 
 /* =========================================================
    LOGIN
    ========================================================= */
 
 async function login(event) {
-
   event.preventDefault();
 
-  const email =
-    $("email").value.trim();
+  const email = $("email").value.trim();
+  const password = $("password").value;
 
-  const password =
-    $("password").value;
-
-  showLoginMessage(
-    "Login हो रहा है..."
-  );
-
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .auth
-      .signInWithPassword({
-        email,
-        password
-      });
-
-  if (error) {
-
-    showLoginMessage(
-      error.message
-    );
-
+  if (!email || !password) {
+    showLoginMessage("Email और Password दोनों भरें।");
     return;
   }
 
-  const isAdmin =
-    await verifyAdmin(
-      data.user.id
-    );
+  const button = $("loginForm").querySelector('button[type="submit"]');
+  button.disabled = true;
+  button.textContent = "Login हो रहा है...";
 
-  if (!isAdmin) {
+  showLoginMessage("Account जाँच रहे हैं...");
 
-    await supabaseClient
-      .auth
-      .signOut();
+  try {
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+      email,
+      password
+    });
 
-    showLoginMessage(
-      "Login successful है, लेकिन admin permission नहीं है।"
-    );
+    if (error) {
+      if (
+        error.message.toLowerCase().includes("invalid login credentials")
+      ) {
+        showLoginMessage(
+          "Email या Password गलत है। Supabase Authentication में Account जाँचें।"
+        );
+      } else if (error.message.toLowerCase().includes("email not confirmed")) {
+        showLoginMessage("पहले Email Confirmation पूरा करें।");
+      } else {
+        showLoginMessage("Login Error: " + error.message);
+      }
+      return;
+    }
 
-    return;
+    const isAdmin = await verifyAdmin(data.user.id);
+
+    if (!isAdmin) {
+      await supabaseClient.auth.signOut();
+      showLoginMessage(
+        "Login सफल हुआ, लेकिन Admin Permission नहीं है। Admins Table जाँचें।"
+      );
+      return;
+    }
+
+    showDashboard(data.user);
+    showLoginMessage("");
+    await loadAdminPosts();
+
+  } catch (error) {
+    showLoginMessage("Login Error: " + error.message);
+  } finally {
+    button.disabled = false;
+    button.textContent = "Login";
   }
-
-  showDashboard(
-    data.user
-  );
-
-  await loadAdminPosts();
 }
-
 
 /* =========================================================
    VERIFY ADMIN
    ========================================================= */
 
 async function verifyAdmin(userId) {
-
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .from("admins")
-      .select("user_id")
-      .eq("user_id", userId)
-      .maybeSingle();
+  const { data, error } = await supabaseClient
+    .from("admins")
+    .select("user_id")
+    .eq("user_id", userId)
+    .maybeSingle();
 
   if (error) {
-
-    console.error(error);
-
+    console.error("Admin verification:", error);
+    showLoginMessage("Admin Permission जाँच Error: " + error.message);
     return false;
   }
 
   return Boolean(data);
 }
 
-
 /* =========================================================
    SHOW DASHBOARD
    ========================================================= */
 
 function showDashboard(user) {
-
-  $("loginSection")
-    .classList
-    .add("hidden");
-
-  $("dashboardSection")
-    .classList
-    .remove("hidden");
-
-  $("adminEmail")
-    .textContent =
-    user.email || "";
-
+  $("loginSection").classList.add("hidden");
+  $("dashboardSection").classList.remove("hidden");
+  $("adminEmail").textContent = user.email || "";
 }
-
 
 /* =========================================================
    LOGOUT
    ========================================================= */
 
 async function logout() {
-
-  await supabaseClient
-    .auth
-    .signOut();
-
+  await supabaseClient.auth.signOut();
   location.reload();
 }
-
 
 /* =========================================================
    SAVE POST
    ========================================================= */
 
 async function savePost(event) {
-
   event.preventDefault();
 
+  const title = $("title").value.trim();
+  const festivalValue = getFestivalValue();
+
+  if (!title) {
+    showFormMessage("Title आवश्यक है।");
+    return;
+  }
+
+  if (!festivalValue) {
+    showFormMessage("Festival का नाम लिखें या चुनें।");
+    return;
+  }
+
+  const content = $("content").value.trim();
+
+  if (!content) {
+    showFormMessage("Content आवश्यक है।");
+    return;
+  }
+
+  const yearValue = $("year").value;
+
   const postData = {
-    title: $("title").value.trim(),
-
-    slug: makeSlug(
-      $("title").value.trim()
-    ),
-
+    title,
+    slug: makeSlug(title),
     category: $("category").value,
-    festival: $("festival").value,
-    year: $("year").value,
+    festival: festivalValue,
+    year: yearValue ? Number(yearValue) : null,
     excerpt: $("excerpt").value.trim(),
-    content: $("content").value.trim(),
+    content,
     keywords: $("keywords").value.trim(),
-
     featured: $("featured").checked,
     published: $("published").checked
   };
 
-  if (!postData.title) {
+  const saveButton = $("saveBtn");
 
-    showFormMessage(
-      "Title required है।"
-    );
-
-    return;
-  }
-
-  if (!postData.content) {
-
-    showFormMessage(
-      "Content required है।"
-    );
-
-    return;
-  }
-
-  $("saveBtn").disabled = true;
-
-  $("saveBtn").textContent =
-    editingId
-      ? "Updating..."
-      : "Publishing...";
+  saveButton.disabled = true;
+  saveButton.textContent = editingId ? "Updating..." : "Publishing...";
 
   try {
-
     let result;
 
     if (editingId) {
-
-      result =
-        await supabaseClient
-          .from("posts")
-          .update(postData)
-          .eq("id", editingId);
-
+      result = await supabaseClient
+        .from("posts")
+        .update(postData)
+        .eq("id", editingId);
     } else {
-
-      result =
-        await supabaseClient
-          .from("posts")
-          .insert(postData);
-
+      result = await supabaseClient
+        .from("posts")
+        .insert(postData);
     }
 
     if (result.error) {
-
-      console.error(
-        "Supabase error:",
-        result.error
-      );
-
-      showFormMessage(
-        result.error.message
-      );
-
+      showFormMessage("Save Error: " + result.error.message);
+      console.error(result.error);
       return;
     }
 
-    showFormMessage(
-      editingId
-        ? "Post updated ✓"
-        : "Post published ✓"
-    );
+    showFormMessage(editingId ? "Post Updated ✓" : "Post Published ✓");
 
     resetForm();
-
     await loadAdminPosts();
 
   } catch (error) {
-
-    console.error(
-      "Save post error:",
-      error
-    );
-
-    showFormMessage(
-      error.message ||
-      "Post save नहीं हो पाया।"
-    );
-
+    showFormMessage("Error: " + error.message);
   } finally {
-
-    $("saveBtn").disabled = false;
-
-    $("saveBtn").textContent =
-      "Publish Post";
+    saveButton.disabled = false;
+    saveButton.textContent = editingId ? "Update Post" : "Publish Post";
   }
 }
 
-
 /* =========================================================
-   LOAD ADMIN POSTS
+   LOAD POSTS
    ========================================================= */
 
 async function loadAdminPosts() {
-
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .from("posts")
-      .select("*")
-      .order(
-        "created_at",
-        {
-          ascending: false
-        }
-      );
-
+  const { data, error } = await supabaseClient
+    .from("posts")
+    .select("*")
+    .order("created_at", { ascending: false });
 
   if (error) {
-
     console.error(error);
-
+    $("adminPosts").innerHTML =
+      `<p class="text-red-400">Posts Load Error: ${escapeHTML(error.message)}</p>`;
     return;
   }
 
-
-  $("postCount")
-    .textContent =
-    `${data.length} posts`;
-
-
-  $("adminPosts")
-    .innerHTML =
-    data
-      .map(
-        createAdminPost
-      )
-      .join("");
-
+  $("postCount").textContent = `${data.length} posts`;
+  $("adminPosts").innerHTML = data.map(createAdminPost).join("");
 }
 
-
 /* =========================================================
-   ADMIN CARD
+   POST CARD
    ========================================================= */
 
 function createAdminPost(post) {
-
   return `
-    <article
-      class="bg-white/5 border border-white/10 rounded-2xl p-5"
-    >
-
+    <article class="bg-white/5 border border-white/10 rounded-2xl p-5">
       <div class="flex items-start justify-between gap-4">
-
         <div>
-
-          <div class="flex gap-2 mb-2">
-
+          <div class="flex flex-wrap gap-2 mb-2">
             <span class="text-xs text-amber-400">
               ${escapeHTML(post.festival)}
             </span>
@@ -457,278 +360,214 @@ function createAdminPost(post) {
               ${escapeHTML(post.category)}
             </span>
 
-            ${
-              post.published
-                ? `
-                  <span class="text-xs text-emerald-400">
-                    Published
-                  </span>
-                `
-                : `
-                  <span class="text-xs text-red-400">
-                    Draft
-                  </span>
-                `
-            }
-
+            <span class="text-xs ${
+              post.published ? "text-emerald-400" : "text-red-400"
+            }">
+              ${post.published ? "Published" : "Draft"}
+            </span>
           </div>
 
-          <h3 class="font-bold">
-            ${escapeHTML(post.title)}
-          </h3>
+          <h3 class="font-bold">${escapeHTML(post.title)}</h3>
 
           <p class="text-sm text-slate-500 mt-1">
-            ${escapeHTML(
-              post.excerpt || ""
-            )}
+            ${escapeHTML(post.excerpt || "")}
           </p>
-
         </div>
 
-
-        <div class="flex gap-2">
-
+        <div class="flex gap-2 shrink-0">
           <button
             onclick="editPost('${post.id}')"
             class="px-3 py-2 text-xs rounded-lg bg-white/10"
-          >
-            Edit
-          </button>
+          >Edit</button>
 
           <button
             onclick="deletePost('${post.id}')"
             class="px-3 py-2 text-xs rounded-lg bg-red-500/10 text-red-300"
-          >
-            Delete
-          </button>
-
+          >Delete</button>
         </div>
-
       </div>
-
     </article>
   `;
 }
 
-
 /* =========================================================
-   EDIT
+   EDIT POST
    ========================================================= */
 
 async function editPost(id) {
-
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .from("posts")
-      .select("*")
-      .eq("id", id)
-      .single();
-
+  const { data, error } = await supabaseClient
+    .from("posts")
+    .select("*")
+    .eq("id", id)
+    .single();
 
   if (error) {
-
-    alert(
-      error.message
-    );
-
+    alert("Edit Error: " + error.message);
     return;
   }
-
 
   editingId = id;
 
   $("postId").value = id;
+  $("title").value = data.title || "";
+  $("category").value = data.category || "Wishes";
 
-  $("title").value =
-    data.title || "";
+  setFestivalValue(data.festival || "General");
 
-  $("category").value =
-    data.category || "Wishes";
+  $("year").value = data.year || "";
+  $("excerpt").value = data.excerpt || "";
+  $("content").value = data.content || "";
+  $("keywords").value = data.keywords || "";
 
-  $("festival").value =
-    data.festival || "General";
+  $("featured").checked = Boolean(data.featured);
+  $("published").checked = Boolean(data.published);
 
-  $("year").value =
-    data.year || "";
+  $("saveBtn").textContent = "Update Post";
+  $("formMessage").textContent = "";
 
-  $("excerpt").value =
-    data.excerpt || "";
-
-  $("content").value =
-    data.content || "";
-
-  $("keywords").value =
-    data.keywords || "";
-
-  $("featured").checked =
-    Boolean(data.featured);
-
-  $("published").checked =
-    Boolean(data.published);
-
-
-  $("saveBtn")
-    .textContent =
-    "Update Post";
-
-
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth"
-  });
-
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-
 /* =========================================================
-   DELETE
+   DELETE POST
    ========================================================= */
 
 async function deletePost(id) {
-
-  const confirmed =
-    confirm(
-      "क्या आप यह post permanently delete करना चाहते हैं?"
-    );
-
-  if (!confirmed) {
+  if (!confirm("क्या आप यह Post Permanently Delete करना चाहते हैं?")) {
     return;
   }
 
-
-  const {
-    error
-  } =
-    await supabaseClient
-      .from("posts")
-      .delete()
-      .eq("id", id);
-
+  const { error } = await supabaseClient
+    .from("posts")
+    .delete()
+    .eq("id", id);
 
   if (error) {
-
-    alert(
-      error.message
-    );
-
+    alert("Delete Error: " + error.message);
     return;
   }
 
-
   await loadAdminPosts();
-
 }
-
 
 /* =========================================================
    RESET
    ========================================================= */
 
 function resetForm() {
-
   editingId = null;
 
   $("postForm").reset();
 
-  $("year").value =
-    "2026";
+  $("postId").value = "";
+  $("year").value = "2026";
+  $("published").checked = true;
 
-  $("published").checked =
-    true;
+  $("festival").value = "Navratri";
 
-  $("saveBtn")
-    .textContent =
-    "Publish Post";
+  $("customFestival").value = "";
+  $("customFestival").classList.add("hidden");
+  $("customFestival").required = false;
 
+  $("saveBtn").textContent = "Publish Post";
+  $("formMessage").textContent = "";
 }
-
 
 /* =========================================================
    SLUG
    ========================================================= */
 
 function makeSlug(title) {
-
-  const transliterationMap = {
+  const map = {
     "नवरात्रि": "navratri",
     "दशहरा": "dussehra",
     "दीपावली": "diwali",
     "दिवाली": "diwali",
     "शुभकामनाएं": "wishes",
-    "शुभकामना": "wish"
+    "शुभकामना": "wish",
+    "छठ": "chhath",
+    "पूजा": "puja",
+    "होली": "holi"
   };
 
   let value = title;
 
-  Object.entries(
-    transliterationMap
-  ).forEach(
-    ([hindi, english]) => {
+  Object.entries(map).forEach(([hindi, english]) => {
+    value = value.replaceAll(hindi, english);
+  });
 
-      value =
-        value.replaceAll(
-          hindi,
-          english
-        );
+  value = value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 
-    }
-  );
-
-  value =
-    value
-      .toLowerCase()
-      .trim()
-      .replace(
-        /[^a-z0-9]+/g,
-        "-"
-      )
-      .replace(
-        /^-+|-+$/g,
-        ""
-      );
-
-  return value ||
-    `post-${Date.now()}`;
+  return value || `post-${Date.now()}`;
 }
-
 
 /* =========================================================
    MESSAGES
    ========================================================= */
 
-function showLoginMessage(
-  message
-) {
-
-  $("loginMessage")
-    .textContent =
-    message;
+function showLoginMessage(message) {
+  $("loginMessage").textContent = message;
 }
 
-
-function showFormMessage(
-  message
-) {
-
-  $("formMessage")
-    .textContent =
-    message;
+function showFormMessage(message) {
+  $("formMessage").textContent = message;
 }
-
 
 /* =========================================================
-   ESCAPE
+   HTML ESCAPE
    ========================================================= */
 
 function escapeHTML(value) {
-
   return String(value ?? "")
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+
+const forgotPasswordBtn = document.getElementById("forgotPasswordBtn");
+
+if (forgotPasswordBtn) {
+  forgotPasswordBtn.addEventListener("click", async () => {
+    const emailInput = document.getElementById("email");
+    const email = emailInput?.value.trim();
+
+    if (!email) {
+      alert("पहले Email दर्ज करो!");
+      emailInput?.focus();
+      return;
+    }
+
+    const confirmed = confirm(
+      `${email} पर Password Reset Link भेजें?`
+    );
+
+    if (!confirmed) return;
+
+    forgotPasswordBtn.disabled = true;
+    forgotPasswordBtn.textContent = "Sending...";
+
+    try {
+      const { error } =
+        await supabaseClient.auth.resetPasswordForEmail(email, {
+          redirectTo: window.location.origin +
+            window.location.pathname.replace(/admin\.html$/, "reset-password.html")
+        });
+
+      if (error) throw error;
+
+      alert("Password Reset Email भेज दिया गया है। Gmail Inbox और Spam चेक करें।");
+    } catch (error) {
+      alert("Error: " + error.message);
+    } finally {
+      forgotPasswordBtn.disabled = false;
+      forgotPasswordBtn.textContent = "Forgot Password?";
+    }
+  });
 }
