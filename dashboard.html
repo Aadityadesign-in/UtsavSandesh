@@ -111,6 +111,17 @@
         class="text-sm text-center mt-4 text-slate-400"
       ></p>
 
+      
+<div class="text-right mt-2 mb-4">
+  <button
+    type="button"
+    id="forgotPasswordBtn"
+    class="text-orange-400 hover:text-orange-300 text-sm font-medium"
+  >
+    Forgot Password?
+  </button>
+</div>
+
     </div>
 
   </section>
@@ -232,25 +243,42 @@
           </select>
 
 
-          <label class="text-sm">
-            Festival
-          </label>
+          
+<label class="text-sm">
+  Festival
+</label>
 
-          <select
-            id="festival"
-            class="mt-2 mb-4 w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-3 outline-none"
-          >
+<select
+  id="festival"
+  class="mt-2 mb-3 w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-3 outline-none"
+>
+  <option value="Navratri">Navratri</option>
+  <option value="Dussehra">Dussehra</option>
+  <option value="Diwali">Diwali</option>
+  <option value="Holi">Holi</option>
+  <option value="Chhath Puja">Chhath Puja</option>
+  <option value="Raksha Bandhan">Raksha Bandhan</option>
+  <option value="Janmashtami">Janmashtami</option>
+  <option value="General">General</option>
+  <option value="__custom__">➕ नया Festival लिखें</option>
+</select>
 
-            <option>Navratri</option>
-            <option>Dussehra</option>
-            <option>Diwali</option>
-            <option>Holi</option>
-            <option>Chhath Puja</option>
-            <option>Raksha Bandhan</option>
-            <option>Janmashtami</option>
-            <option>General</option>
+<input
+  id="customFestival"
+  type="text"
+  maxlength="100"
+  class="hidden mb-4 w-full bg-black/20 border border-amber-400/40 rounded-xl px-4 py-3 outline-none"
+  placeholder="Festival का नाम लिखें (जैसे Sama Chakeva)"
+>
 
-          </select>
+<input
+  id="customFestival"
+  type="text"
+  maxlength="100"
+  class="hidden mb-4 w-full bg-black/20 border border-amber-400/40 rounded-xl px-4 py-3 outline-none focus:border-amber-400"
+  placeholder="Festival का नाम लिखें (जैसे Sama Chakeva)"
+>
+
 
 
           <label class="text-sm">
