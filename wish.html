@@ -1,0 +1,668 @@
+
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080d1b">
+
+<title>UtsavSandesh | Wishes Studio</title>
+<meta name="description" content="अपनी फोटो, नाम और संदेश से सुंदर Festival Greeting Cards बनाएं और शेयर करें।">
+<link rel="canonical" href="https://aadityadesign-in.github.io/UtsavSandesh/wish.html">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='85'%3E✨%3C/text%3E%3C/svg%3E">
+
+<style>
+*{box-sizing:border-box}
+
+:root{
+--bg:#080d1b;
+--panel:#111a2d;
+--gold:#ffca69;
+--orange:#ff8a42;
+--text:#f5f7ff;
+--muted:#aab6ce;
+--border:#26334c;
+}
+
+body{
+margin:0;
+background:
+radial-gradient(circle at 10% 0,#19284b,transparent 35%),
+radial-gradient(circle at 90% 20%,#392044,transparent 28%),
+var(--bg);
+color:var(--text);
+font:16px/1.6 system-ui,"Noto Sans Devanagari",Mangal,sans-serif;
+min-height:100vh;
+}
+
+button,input,select,textarea{font:inherit}
+
+header{
+padding:18px 5%;
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:12px;
+border-bottom:1px solid #ffffff15;
+flex-wrap:wrap;
+}
+
+.brand{
+font-weight:900;
+font-size:22px;
+text-decoration:none;
+color:white;
+}
+
+.brand span{color:var(--gold)}
+
+.header-actions{
+display:flex;
+align-items:center;
+gap:12px;
+flex-wrap:wrap;
+}
+
+.tag{color:var(--muted);font-size:13px}
+
+.home-btn{
+text-decoration:none;
+background:#202b43;
+border:1px solid #3a4966;
+color:#fff;
+padding:9px 15px;
+border-radius:10px;
+font-weight:700;
+}
+
+main{
+max-width:1200px;
+margin:30px auto;
+padding:0 16px;
+}
+
+.intro{text-align:center;margin-bottom:28px}
+
+.intro h1{
+font-size:clamp(28px,4vw,45px);
+margin:0 0 8px;
+background:linear-gradient(90deg,#fff,var(--gold));
+color:transparent;
+background-clip:text;
+}
+
+.intro p{color:var(--muted);margin:0}
+
+.layout{
+display:grid;
+grid-template-columns:minmax(0,420px) minmax(0,1fr);
+gap:22px;
+align-items:start;
+}
+
+.panel{
+background:#10182aee;
+border:1px solid var(--border);
+border-radius:22px;
+padding:20px;
+box-shadow:0 18px 50px #0003;
+min-width:0;
+}
+
+.panel h2{font-size:18px;margin:0 0 16px}
+
+.field{margin:13px 0}
+
+label{
+display:block;
+color:#dbe3f5;
+font-size:14px;
+margin-bottom:7px;
+}
+
+input,select,textarea{
+width:100%;
+border:1px solid #33425f;
+background:#0a1120;
+color:white;
+padding:12px;
+border-radius:11px;
+outline:none;
+}
+
+input:focus,select:focus,textarea:focus{
+border-color:var(--gold);
+box-shadow:0 0 0 2px #ffca6920;
+}
+
+input[type=file]{padding:9px}
+
+select option{background:#0a1120;color:white}
+
+textarea{min-height:110px;resize:vertical}
+
+.row{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+}
+
+.buttons{
+display:flex;
+flex-wrap:wrap;
+gap:9px;
+margin-top:16px;
+}
+
+.btn{
+border:0;
+border-radius:11px;
+padding:12px 15px;
+font-weight:750;
+cursor:pointer;
+background:linear-gradient(135deg,var(--gold),var(--orange));
+color:#241305;
+transition:.2s;
+}
+
+.btn.secondary{
+background:#202b43;
+color:#eaf0ff;
+border:1px solid #3a4966;
+}
+
+.btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+
+.preview-panel{position:sticky;top:15px}
+
+.canvas-wrap{
+background:#080d18;
+border:1px solid #2c3850;
+border-radius:16px;
+padding:12px;
+display:flex;
+justify-content:center;
+overflow:hidden;
+}
+
+canvas{
+width:100%;
+height:auto;
+max-width:600px;
+border-radius:10px;
+display:block;
+background:#101326;
+}
+
+.tip{color:var(--muted);font-size:13px;margin:10px 0 0}
+.photo-status{font-size:13px;color:var(--gold);margin-top:6px}
+.status{font-size:14px;color:var(--gold);margin-top:12px;min-height:24px}
+footer{text-align:center;padding:28px 12px;color:#8795b1;font-size:13px}
+
+@media(max-width:850px){
+.layout{grid-template-columns:1fr}
+.preview-panel{position:static}
+.panel{padding:16px}
+}
+
+@media(max-width:430px){
+header{padding:14px}
+.row{grid-template-columns:1fr}
+.header-actions{width:100%;justify-content:space-between}
+.btn{padding:11px 13px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<a class="brand" href="./index.html">✨ Utsav<span>Sandesh</span></a>
+
+<div class="header-actions">
+<div class="tag">Wishes Studio · Create & Share</div>
+<a class="home-btn" href="./index.html">← Home</a>
+</div>
+</header>
+
+<main>
+
+<section class="intro">
+<h1>अपनी शुभकामना बनाएं</h1>
+<p>अपना संदेश, नाम और फोटो जोड़ें — फिर सुंदर HD कार्ड डाउनलोड करें।</p>
+</section>
+
+<div class="layout">
+
+<section class="panel">
+<h2>🎨 कार्ड कस्टमाइज़ करें</h2>
+
+<div class="field">
+<label for="festival">त्योहार / अवसर</label>
+<select id="festival">
+<option>दीपावली</option>
+<option>छठ पूजा</option>
+<option>होली</option>
+<option>दशहरा</option>
+<option>नवरात्रि</option>
+<option>रक्षाबंधन</option>
+<option>ईद</option>
+<option>जन्मदिन</option>
+<option>नववर्ष</option>
+<option>शुभकामनाएँ</option>
+</select>
+</div>
+
+<div class="field">
+<label for="style">कार्ड स्टाइल</label>
+<select id="style">
+<option value="royal">Royal Gold</option>
+<option value="floral">Floral Pink</option>
+<option value="devotional">Devotional Green</option>
+<option value="modern">Modern Blue</option>
+<option value="sunset">Sunset Orange</option>
+</select>
+</div>
+
+<div class="row">
+<div class="field">
+<label for="to">किसके लिए?</label>
+<input id="to" maxlength="60" placeholder="प्रिय मित्र / परिवार">
+</div>
+
+<div class="field">
+<label for="from">भेजने वाले</label>
+<input id="from" maxlength="60" placeholder="आपका नाम">
+</div>
+</div>
+
+<div class="field">
+<label for="message">आपका संदेश</label>
+<textarea id="message" maxlength="700" placeholder="आपके जीवन में खुशियाँ और समृद्धि आए..."></textarea>
+</div>
+
+<div class="field">
+<label for="photo">अपनी फोटो (वैकल्पिक)</label>
+<input id="photo" type="file" accept="image/jpeg,image/png,image/webp">
+<div class="photo-status" id="photoStatus">
+फोटो नहीं लगी है — बिना फोटो वाला कार्ड तैयार है।
+</div>
+</div>
+
+<div class="buttons">
+<button class="btn secondary" id="removePhoto" type="button">फोटो हटाएँ</button>
+<button class="btn secondary" id="random" type="button">✨ नया डिज़ाइन</button>
+</div>
+
+<div class="buttons">
+<button class="btn" id="download" type="button">⬇ HD PNG डाउनलोड</button>
+<button class="btn secondary" id="share" type="button">📲 WhatsApp शेयर</button>
+<button class="btn secondary" id="copy" type="button">📋 संदेश कॉपी</button>
+</div>
+
+<div class="status" id="status" role="status" aria-live="polite"></div>
+
+<p class="tip">
+🔒 आपकी फोटो केवल ब्राउज़र में प्रोसेस होती है। सर्वर पर अपलोड नहीं होती।
+</p>
+</section>
+
+<section class="panel preview-panel">
+<h2>🪄 Live Preview</h2>
+<div class="canvas-wrap">
+<canvas id="card" width="1200" height="1500"></canvas>
+</div>
+<p class="tip">यह Preview है। डाउनलोड हाई-रेज़ोल्यूशन PNG में मिलेगा।</p>
+</section>
+
+</div>
+</main>
+
+<footer>
+Made with ✨ by UtsavSandesh · शुभकामनाएँ दिल से
+</footer>
+
+<script>
+(()=>{
+"use strict";
+
+const $=id=>document.getElementById(id);
+const canvas=$("card");
+const ctx=canvas.getContext("2d");
+
+let photoObj=null;
+let photoURL=null;
+let design=0;
+
+const palettes={
+royal:["#101326","#342044","#ffd879","#fff4d2"],
+floral:["#35152d","#702e58","#ffc4dc","#fff0f7"],
+devotional:["#092c25","#14513c","#f6d477","#fff8df"],
+modern:["#081c3c","#174d78","#8de4ff","#e9faff"],
+sunset:["#421a18","#9b3c25","#ffd09a","#fff2d9"]
+};
+
+const wishes={
+"दीपावली":"दीपों की रोशनी आपके जीवन में सुख, शांति और समृद्धि लाए। शुभ दीपावली!",
+"छठ पूजा":"छठी मैया आपके परिवार को सुख, स्वास्थ्य और खुशहाली प्रदान करें। छठ पूजा की शुभकामनाएँ!",
+"होली":"रंगों का यह त्योहार आपके जीवन को खुशियों से भर दे। होली की हार्दिक शुभकामनाएँ!",
+"दशहरा":"सत्य और अच्छाई की हमेशा विजय हो। विजयादशमी की शुभकामनाएँ!",
+"नवरात्रि":"माँ दुर्गा की कृपा आपके जीवन में शक्ति और खुशियाँ लाए। शुभ नवरात्रि!",
+"रक्षाबंधन":"रिश्तों में प्यार और विश्वास हमेशा बना रहे। रक्षाबंधन की शुभकामनाएँ!",
+"ईद":"आपके जीवन में अमन, खुशियाँ और बरकत बनी रहे। ईद मुबारक!",
+"जन्मदिन":"आपका हर दिन खुशियों और सफलता से भरा हो। जन्मदिन की शुभकामनाएँ!",
+"नववर्ष":"नया साल नई उम्मीदें, खुशियाँ और सफलता लेकर आए। नववर्ष मंगलमय हो!",
+"शुभकामनाएँ":"आपके हर कदम पर खुशियाँ और सफलता साथ रहें। ढेरों शुभकामनाएँ!"
+};
+
+function setStatus(message){
+$("status").textContent=message;
+}
+
+function rounded(x,y,w,h,r){
+ctx.beginPath();
+if(ctx.roundRect){
+ctx.roundRect(x,y,w,h,r);
+}else{
+ctx.moveTo(x+r,y);
+ctx.arcTo(x+w,y,x+w,y+h,r);
+ctx.arcTo(x+w,y+h,x,y+h,r);
+ctx.arcTo(x,y+h,x,y,r);
+ctx.arcTo(x,y,x+w,y,r);
+ctx.closePath();
+}
+}
+
+function wrapText(text,maxWidth,font){
+ctx.font=font;
+const words=(text||"").trim().split(/\s+/);
+const lines=[];
+let line="";
+
+for(const word of words){
+const test=line?line+" "+word:word;
+
+if(ctx.measureText(test).width>maxWidth&&line){
+lines.push(line);
+line=word;
+}else{
+line=test;
+}
+}
+if(line)lines.push(line);
+return lines;
+}
+
+function draw(){
+const f=$("festival").value;
+const st=$("style").value;
+const p=palettes[st]||palettes.royal;
+
+ctx.clearRect(0,0,1200,1500);
+
+let g=ctx.createLinearGradient(0,0,1200,1500);
+g.addColorStop(0,p[0]);
+g.addColorStop(.55,p[1]);
+g.addColorStop(1,p[0]);
+
+ctx.fillStyle=g;
+ctx.fillRect(0,0,1200,1500);
+
+// Decorative circles
+ctx.strokeStyle=p[2]+"55";
+ctx.lineWidth=3;
+
+for(let r=260;r<650;r+=95){
+ctx.beginPath();
+ctx.arc(600,410,r,0,Math.PI*2);
+ctx.stroke();
+}
+
+// Sparkles
+for(let i=0;i<65;i++){
+const x=(i*197+design*71)%1200;
+const y=(i*317+design*43)%1500;
+
+ctx.fillStyle=p[2]+(i%3?"55":"aa");
+ctx.beginPath();
+ctx.arc(x,y,i%4+2,0,Math.PI*2);
+ctx.fill();
+}
+
+// Border
+ctx.strokeStyle=p[2];
+ctx.lineWidth=5;
+rounded(45,45,1110,1410,42);
+ctx.stroke();
+
+ctx.strokeStyle=p[2]+"88";
+ctx.lineWidth=2;
+rounded(65,65,1070,1370,32);
+ctx.stroke();
+
+// Heading
+ctx.textAlign="center";
+ctx.fillStyle=p[2];
+ctx.font="bold 42px system-ui,sans-serif";
+ctx.fillText("✦  उत्सव संदेश  ✦",600,145);
+
+ctx.fillStyle=p[3];
+ctx.font="bold 58px 'Noto Sans Devanagari',Mangal,sans-serif";
+ctx.fillText(f,600,250);
+
+ctx.fillStyle=p[2];
+ctx.font="28px system-ui";
+ctx.fillText("हार्दिक शुभकामनाएँ",600,310);
+
+// Photo
+if(photoObj){
+ctx.save();
+ctx.beginPath();
+ctx.arc(600,485,145,0,Math.PI*2);
+ctx.clip();
+
+const iw=photoObj.width;
+const ih=photoObj.height;
+const scale=Math.max(290/iw,290/ih);
+const w=iw*scale;
+const h=ih*scale;
+
+ctx.drawImage(photoObj,600-w/2,485-h/2,w,h);
+ctx.restore();
+
+ctx.strokeStyle=p[2];
+ctx.lineWidth=10;
+ctx.beginPath();
+ctx.arc(600,485,150,0,Math.PI*2);
+ctx.stroke();
+}
+
+const to=$("to").value.trim();
+const from=$("from").value.trim();
+
+if(to){
+ctx.fillStyle=p[2];
+ctx.font="bold 35px 'Noto Sans Devanagari',Mangal,sans-serif";
+ctx.fillText("प्रिय "+to,600,photoObj?700:510);
+}
+
+// Message
+const msg=$("message").value.trim()||wishes[f]||wishes["शुभकामनाएँ"];
+const messageY=photoObj?790:(to?620:570);
+const maxWidth=850;
+const lineHeight=66;
+const maxLines=7;
+const font="bold 39px 'Noto Sans Devanagari',Mangal,sans-serif";
+
+let lines=wrapText(msg,maxWidth,font);
+
+if(lines.length>maxLines){
+lines=lines.slice(0,maxLines);
+lines[maxLines-1]=lines[maxLines-1].replace(/[.…]*$/,"")+"…";
+}
+
+ctx.fillStyle=p[3];
+ctx.font=font;
+ctx.textAlign="center";
+
+lines.forEach((line,i)=>{
+ctx.fillText(line,600,messageY+i*lineHeight);
+});
+
+// Bottom message
+ctx.fillStyle=p[2];
+ctx.font="32px 'Noto Sans Devanagari',Mangal,sans-serif";
+ctx.fillText("आपका दिन मंगलमय हो",600,photoObj?1260:1180);
+
+if(from){
+ctx.fillStyle=p[3];
+ctx.font="bold 34px 'Noto Sans Devanagari',Mangal,sans-serif";
+ctx.fillText("सप्रेम: "+from,600,photoObj?1340:1260);
+}
+
+ctx.fillStyle=p[2];
+ctx.font="24px system-ui";
+ctx.fillText("UtsavSandesh  •  शुभकामनाएँ दिल से",600,1410);
+}
+
+// Events
+["festival","style","to","from","message"].forEach(id=>{
+$(id).addEventListener("input",draw);
+});
+
+$("festival").addEventListener("change",()=>{
+if(!$("message").value.trim()){
+$("message").placeholder=wishes[$("festival").value];
+}
+draw();
+});
+
+$("photo").addEventListener("change",e=>{
+const file=e.target.files[0];
+if(!file)return;
+
+if(!["image/jpeg","image/png","image/webp"].includes(file.type)){
+alert("कृपया JPG, PNG या WEBP फोटो चुनें।");
+e.target.value="";
+return;
+}
+
+if(file.size>8*1024*1024){
+alert("8 MB से छोटी फोटो चुनें।");
+e.target.value="";
+return;
+}
+
+const url=URL.createObjectURL(file);
+const img=new Image();
+
+img.onload=()=>{
+if(photoURL)URL.revokeObjectURL(photoURL);
+photoObj=img;
+photoURL=url;
+$("photoStatus").textContent="✓ फोटो कार्ड पर लग गई है।";
+draw();
+};
+
+img.onerror=()=>{
+alert("फोटो पढ़ नहीं पाए। दूसरी फोटो चुनें।");
+URL.revokeObjectURL(url);
+};
+
+img.src=url;
+});
+
+$("removePhoto").onclick=()=>{
+photoObj=null;
+if(photoURL)URL.revokeObjectURL(photoURL);
+photoURL=null;
+$("photo").value="";
+$("photoStatus").textContent="फोटो हट गई है — बिना फोटो वाला कार्ड तैयार है।";
+draw();
+setStatus("फोटो हटा दी गई।");
+};
+
+$("random").onclick=()=>{
+design++;
+const styles=Object.keys(palettes);
+$("style").value=styles[design%styles.length];
+draw();
+setStatus("नया कार्ड डिज़ाइन तैयार है।");
+};
+
+$("download").onclick=()=>{
+try{
+draw();
+const a=document.createElement("a");
+a.download="utsavsandesh-wish.png";
+a.href=canvas.toDataURL("image/png");
+a.click();
+setStatus("HD PNG कार्ड डाउनलोड शुरू हो गया।");
+}catch(e){
+setStatus("डाउनलोड नहीं हो पाया। कृपया दोबारा प्रयास करें।");
+}
+};
+
+function getShareMessage(){
+const f=$("festival").value;
+const msg=$("message").value.trim()||wishes[f]||wishes["शुभकामनाएँ"];
+
+return msg+"\n"+
+($("to").value.trim()?"प्रिय "+$("to").value.trim()+"\n":"")+
+($("from").value.trim()?"— "+$("from").value.trim()+"\n":"")+
+"\nUtsavSandesh\n"+
+location.origin+location.pathname;
+}
+
+$("share").onclick=async()=>{
+draw();
+
+const message=getShareMessage();
+
+try{
+if(!canvas.toBlob){
+throw new Error("Canvas sharing unavailable");
+}
+
+const blob=await new Promise(resolve=>canvas.toBlob(resolve,"image/png"));
+
+if(!blob)throw new Error("Image creation failed");
+
+const file=new File([blob],"utsavsandesh-wish.png",{type:"image/png"});
+
+if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+await navigator.share({
+files:[file],
+text:message,
+title:"UtsavSandesh Wish"
+});
+setStatus("शेयर विंडो खुल गई।");
+}else{
+window.open("https://wa.me/?text="+encodeURIComponent(message),"_blank");
+setStatus("WhatsApp पर संदेश शेयर करें।");
+}
+}catch(e){
+window.open("https://wa.me/?text="+encodeURIComponent(message),"_blank");
+setStatus("WhatsApp पर संदेश शेयर करें।");
+}
+};
+
+$("copy").onclick=async()=>{
+const text=getShareMessage();
+
+try{
+await navigator.clipboard.writeText(text);
+setStatus("संदेश कॉपी हो गया!");
+}catch(e){
+prompt("संदेश कॉपी करें:",text);
+}
+};
+
+draw();
+})();
+</script>
+
+</body>
+</html>
