@@ -1,0 +1,192 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- BA favicon -->
+ <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='85'%3E✨%3C/text%3E%3C/svg%3E">
+
+<title>Feedback Admin | UtsavSandesh</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+
+<style>
+body{
+  background:#080810;color:#fff;
+  font-family:Arial,sans-serif;
+  padding:20px;max-width:1100px;margin:auto;
+}
+h1{color:#ffb84a}
+button{
+  padding:10px 14px;border:0;border-radius:8px;
+  cursor:pointer;margin:4px;
+}
+.approve{background:#25d366;color:#111}
+.delete{background:#ff6b6b;color:#111}
+.refresh{background:#ffb84a;color:#111}
+.card{
+  background:#11111c;padding:18px;
+  border:1px solid #292938;
+  border-radius:14px;margin:15px 0;
+}
+.meta{color:#aaa;font-size:13px}
+.message{line-height:1.6;overflow-wrap:anywhere}
+#status{color:#ffb84a;margin:15px 0}
+</style>
+</head>
+
+<body>
+
+<h1>💬 Feedback Management</h1>
+
+<button class="refresh" onclick="loadFeedback()">Refresh</button>
+<button onclick="logout()">Logout</button>
+
+<div id="status">Checking admin access...</div>
+<div id="feedbackList"></div>
+
+<script>
+const cfg = window.SUPABASE_CONFIG;
+const sb = window.supabase.createClient(cfg.url, cfg.key);
+
+const statusBox = document.getElementById("status");
+const list = document.getElementById("feedbackList");
+
+async function checkAdmin() {
+  const { data: { user }, error } = await sb.auth.getUser();
+
+  if (error || !user) {
+    statusBox.textContent = "Please login first.";
+    return false;
+  }
+
+  const { data, error: adminError } = await sb
+    .from("admins")
+    .select("user_id")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (adminError || !data) {
+    statusBox.textContent = "Admin access denied.";
+    return false;
+  }
+
+  statusBox.textContent = "Admin verified: " + user.email;
+  return true;
+}
+
+async function loadFeedback() {
+  if (!await checkAdmin()) return;
+
+  list.textContent = "Loading feedback...";
+
+  const { data, error } = await sb
+    .from("feedback")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    list.textContent = "Failed to load feedback.";
+    console.error(error);
+    return;
+  }
+
+  list.replaceChildren();
+
+  if (!data.length) {
+    list.textContent = "No feedback received yet.";
+    return;
+  }
+
+  data.forEach(item => {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const title = document.createElement("h3");
+    title.textContent = (item.name || "Anonymous") +
+      " · " + "★".repeat(item.rating);
+
+    const meta = document.createElement("div");
+    meta.className = "meta";
+    meta.textContent = new Date(item.created_at)
+      .toLocaleString("en-IN");
+
+    const message = document.createElement("p");
+    message.className = "message";
+    message.textContent = item.message;
+
+    const suggestion = document.createElement("p");
+    suggestion.className = "message";
+    suggestion.textContent =
+      "Suggestion: " + (item.suggestion || "None");
+
+    const state = document.createElement("p");
+    state.textContent = item.approved
+      ? "✅ Approved"
+      : "⏳ Pending Approval";
+
+    const approveBtn = document.createElement("button");
+    approveBtn.className = "approve";
+    approveBtn.textContent = item.approved
+      ? "Unapprove"
+      : "Approve";
+
+    approveBtn.onclick = () =>
+      updateApproval(item.id, !item.approved);
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "delete";
+    deleteBtn.textContent = "Delete";
+
+    deleteBtn.onclick = () => deleteFeedback(item.id);
+
+    card.append(
+      title, meta, message, suggestion, state,
+      approveBtn, deleteBtn
+    );
+
+    list.append(card);
+  });
+}
+
+async function updateApproval(id, approved) {
+  const { error } = await sb
+    .from("feedback")
+    .update({ approved })
+    .eq("id", id);
+
+  if (error) {
+    alert("Update failed: " + error.message);
+    return;
+  }
+
+  loadFeedback();
+}
+
+async function deleteFeedback(id) {
+  if (!confirm("Delete this feedback permanently?")) return;
+
+  const { error } = await sb
+    .from("feedback")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    alert("Delete failed: " + error.message);
+    return;
+  }
+
+  loadFeedback();
+}
+
+async function logout() {
+  await sb.auth.signOut();
+  location.href = "admin.html";
+}
+
+loadFeedback();
+</script>
+</body>
+</html>
