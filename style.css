@@ -1233,3 +1233,233 @@ img{max-width:100%;height:auto}
   border: none;
   cursor: pointer;
 }
+
+
+.feedback-link{
+  display:inline-block;
+  padding:12px 20px;
+  background:#ffb84a;
+  color:#111;
+  text-decoration:none;
+  border-radius:10px;
+  font-weight:bold;
+}
+
+/* =====================================
+   UTSAVSANDESH ULTRA PRO FEEDBACK
+===================================== */
+
+.feedback-section{
+  padding:75px 20px;
+  background:
+    radial-gradient(ellipse at top,#19132b 0%,transparent 55%),
+    #080810;
+  color:#fff;
+}
+
+.feedback-container{
+  max-width:1150px;
+  margin:auto;
+}
+
+.feedback-heading{
+  text-align:center;
+  margin-bottom:35px;
+}
+
+.feedback-tag{
+  color:#ffb84a;
+  font-size:12px;
+  letter-spacing:3px;
+  font-weight:800;
+}
+
+.feedback-heading h2{
+  font-size:clamp(28px,5vw,42px);
+  margin:15px 0;
+}
+
+.feedback-heading p{
+  color:#aaaab8;
+}
+
+.feedback-stats{
+  display:flex;
+  justify-content:center;
+  gap:20px;
+  flex-wrap:wrap;
+  margin:30px 0;
+}
+
+.feedback-stats div{
+  min-width:150px;
+  padding:20px;
+  text-align:center;
+  background:#12121e;
+  border:1px solid #292938;
+  border-radius:16px;
+}
+
+.feedback-stats strong{
+  display:block;
+  font-size:28px;
+  color:#ffb84a;
+}
+
+.feedback-stats span{
+  display:block;
+  margin-top:8px;
+  font-size:13px;
+  color:#aaaab8;
+}
+
+.feedback-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:22px;
+}
+
+.feedback-form-card,
+.feedback-reviews-card{
+  padding:25px;
+  background:rgba(18,18,30,.92);
+  border:1px solid #292938;
+  border-radius:22px;
+}
+
+.feedback-form-card h3,
+.feedback-reviews-card h3{
+  margin-top:0;
+}
+
+.feedback-form-card label{
+  display:block;
+  margin:18px 0 8px;
+  font-size:14px;
+  font-weight:600;
+}
+
+.feedback-form-card input,
+.feedback-form-card textarea{
+  width:100%;
+  padding:14px;
+  background:#080810;
+  color:#fff;
+  border:1px solid #303044;
+  border-radius:12px;
+  font:inherit;
+}
+
+.feedback-form-card textarea{
+  min-height:100px;
+  resize:vertical;
+}
+
+.feedback-form-card input:focus,
+.feedback-form-card textarea:focus{
+  outline:none;
+  border-color:#ffb84a;
+}
+
+.rating-stars{
+  display:flex;
+  gap:8px;
+  margin:12px 0;
+}
+
+.rating-stars button{
+  border:0;
+  background:transparent;
+  color:#555;
+  font-size:32px;
+  cursor:pointer;
+  padding:0;
+}
+
+.rating-stars button.active{
+  color:#ffb84a;
+}
+
+#feedbackSubmit{
+  width:100%;
+  padding:15px;
+  margin-top:20px;
+  border:0;
+  border-radius:12px;
+  background:linear-gradient(135deg,#ffb84a,#ff8c42);
+  color:#111;
+  font-weight:800;
+  cursor:pointer;
+}
+
+#feedbackSubmit:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+}
+
+#feedbackStatus{
+  text-align:center;
+  font-size:13px;
+  color:#ffb84a;
+}
+
+.reviews-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.reviews-header span{
+  color:#aaaab8;
+  font-size:12px;
+}
+
+.feedback-review{
+  background:#090912;
+  border:1px solid #292938;
+  border-radius:14px;
+  padding:16px;
+  margin:14px 0;
+}
+
+.feedback-review-top{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.feedback-review-name{
+  font-weight:700;
+}
+
+.feedback-review-stars{
+  color:#ffb84a;
+}
+
+.feedback-review-message{
+  line-height:1.7;
+  overflow-wrap:anywhere;
+}
+
+.feedback-review-date{
+  color:#9999aa;
+  font-size:12px;
+}
+
+@media(max-width:750px){
+  .feedback-grid{
+    grid-template-columns:1fr;
+  }
+
+  .feedback-section{
+    padding:45px 14px;
+  }
+
+  .feedback-form-card,
+  .feedback-reviews-card{
+    padding:18px;
+  }
+}
