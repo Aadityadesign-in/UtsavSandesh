@@ -205,6 +205,8 @@
         <a href="#latest">Latest</a>
         <a href="contact.html">Contact</a>
         <a href="wish.html">Wish</a>
+        <a href="#feedbackSection">💬 Feedback</a>
+
       </nav>
 
       <button
@@ -226,6 +228,9 @@
       <a href="#latest">Latest</a>
       <a href="privacy-policy.html">Privacy</a>
       <a href="contact.html">Contact</a>
+      <a href="wish.html">Wish</a>
+      <a href="#feedbackSection">💬 Feedback</a>
+
     </div>
   </header>
 
@@ -298,14 +303,12 @@
           </div>
 
           <h2>
-            Diwali<br>
+            Chhath Puja<br>
             Wishes 2026
           </h2>
 
           <p>
-            • मुस्कुराते हुए दीप तुम जलाना,
-             जीवन में नई खुशियों को लाना।
-              शुभ दीपावली! 🪔✨
+            छठी मैया का आशीर्वाद आप पर और आपके पूरे परिवार पर सदा बना रहे, जय छठी मैया! 🙏✨
           </p>
 
           <button
@@ -320,7 +323,6 @@
       </div>
 
     </section>
-
 
     <!-- TRENDING TICKER -->
     <section class="ticker-section">
@@ -398,6 +400,16 @@
             <strong>Diwali</strong>
             <small>Wishes & Messages</small>
           </button>
+
+           <button
+            class="festival-card general"
+            data-filter="Chhath Puja"
+          >
+            <span class="festival-symbol">🙏</span>
+            <strong>Chhath Puja</strong>
+            <small>Wishes & Quotes</small>
+          </button>
+
 
           <button
             class="festival-card general"
@@ -527,6 +539,84 @@
 
   </main>
 
+<!-- UTSAVSANDESH FEEDBACK SECTION -->
+<section id="feedbackSection" class="feedback-section">
+  <div class="feedback-container">
+
+    <div class="feedback-heading">
+      <span class="feedback-tag">YOUR VOICE MATTERS</span>
+      <h2>💬 Feedback & Reviews</h2>
+      <p>आपको UtsavSandesh कैसा लगा? हमें बताएं!</p>
+    </div>
+
+    <div class="feedback-stats">
+      <div>
+        <strong id="avgRating">0.0</strong>
+        <span>Average Rating</span>
+      </div>
+      <div>
+        <strong id="totalReviews">0</strong>
+        <span>Total Reviews</span>
+      </div>
+    </div>
+
+    <div class="feedback-grid">
+
+      <!-- FORM -->
+      <div class="feedback-form-card">
+        <h3>⭐ अपना अनुभव साझा करें</h3>
+
+        <form id="feedbackForm">
+          <label>Your Rating</label>
+
+          <div class="rating-stars" id="ratingStars">
+            <button type="button" data-rating="1">★</button>
+            <button type="button" data-rating="2">★</button>
+            <button type="button" data-rating="3">★</button>
+            <button type="button" data-rating="4">★</button>
+            <button type="button" data-rating="5">★</button>
+          </div>
+
+          <input type="hidden" id="ratingValue" value="0">
+
+          <label>Your Name</label>
+          <input id="feedbackName" maxlength="60"
+                 placeholder="Anonymous">
+
+          <label>Website कैसी लगी?</label>
+          <textarea id="feedbackMessage"
+            minlength="3" maxlength="1000"
+            required placeholder="अपना अनुभव लिखें..."></textarea>
+
+          <label>कोई नया Feature चाहिए?</label>
+          <textarea id="feedbackSuggestion"
+            maxlength="1000"
+            placeholder="अपना सुझाव लिखें..."></textarea>
+
+          <button type="submit" id="feedbackSubmit">
+            🚀 Submit Feedback
+          </button>
+
+          <p id="feedbackStatus"></p>
+        </form>
+      </div>
+
+      <!-- REVIEWS -->
+      <div class="feedback-reviews-card">
+        <div class="reviews-header">
+          <h3>💖 Community Reviews</h3>
+          <span>Latest Feedback</span>
+        </div>
+
+        <div id="feedbackReviews">
+          Loading reviews...
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
 
   <!-- FOOTER -->
   <footer class="site-footer">
@@ -558,8 +648,10 @@
         <a href="#latest">Latest Wishes</a>
         <a href="contact.html">Contact</a>
         <a href="wish.html">Wish</a>
-      </div>
+        <a href="#feedbackSection">💬 Feedback</a>
 
+
+      </div>
       <div>
         <h3>Legal</h3>
         <div class="footer-column">
@@ -634,6 +726,17 @@
     </div>
 
     <a href="wish.html" class="whats-new-btn">
+      Explore New Feature →
+    </a>
+    <div class="whats-new-item">
+      <span>✨</span>
+      <div>
+        <h3>Feedback Section</h3>
+        <p>Website कैसी लगी? अपना अनुभव और सुझाव साझा करें।</p>
+      </div>
+    </div>
+
+    <a href="feedback.html" class="whats-new-btn">
       Explore New Feature →
     </a>
 
