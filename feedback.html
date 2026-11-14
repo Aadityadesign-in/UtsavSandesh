@@ -1,0 +1,315 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<!-- BA favicon -->
+ <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='85'%3E✨%3C/text%3E%3C/svg%3E">
+
+ <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-K68CD1F8Q0"></script>
+<title>Feedback | UtsavSandesh</title>
+<meta name="description" content="Share your experience with UtsavSandesh and help us improve.">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+
+<style>
+:root{
+  --bg:#080810;
+  --card:#11111c;
+  --accent:#ffb84a;
+  --text:#fff;
+  --muted:#a8a8b8;
+  --border:#292938;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Inter,Arial,sans-serif;
+}
+.container{max-width:850px;margin:auto;padding:25px 16px}
+.top{
+  display:flex;justify-content:space-between;
+  align-items:center;gap:12px;flex-wrap:wrap;
+}
+.top a{color:var(--accent);text-decoration:none}
+.hero{text-align:center;padding:35px 0 20px}
+.hero h1{font-size:35px;margin:10px 0}
+.hero p{color:var(--muted)}
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:22px;margin:20px 0;
+}
+label{display:block;margin:17px 0 8px;font-weight:600}
+input,textarea{
+  width:100%;padding:13px;
+  background:#090912;color:white;
+  border:1px solid var(--border);
+  border-radius:10px;font:inherit;
+}
+textarea{min-height:120px;resize:vertical}
+input:focus,textarea:focus{outline:1px solid var(--accent)}
+.stars{
+  display:flex;gap:8px;
+  font-size:35px;cursor:pointer;
+}
+.stars button{
+  background:none;border:0;
+  color:#555;font-size:35px;cursor:pointer;
+  padding:0;
+}
+.stars button.active{color:var(--accent)}
+button.submit{
+  width:100%;padding:14px;margin-top:18px;
+  background:var(--accent);color:#111;
+  border:0;border-radius:10px;
+  font-weight:bold;font-size:16px;cursor:pointer;
+}
+button:disabled{opacity:.5;cursor:not-allowed}
+#status{margin-top:15px;text-align:center}
+.review{
+  background:#090912;border:1px solid var(--border);
+  border-radius:12px;padding:16px;margin:12px 0;
+}
+.review-head{
+  display:flex;justify-content:space-between;
+  gap:10px;flex-wrap:wrap;
+}
+.review-name{font-weight:bold}
+.review-stars{color:var(--accent)}
+.review-date{color:var(--muted);font-size:12px}
+.review p{line-height:1.6;overflow-wrap:anywhere}
+.muted{color:var(--muted)}
+footer{text-align:center;color:var(--muted);padding:25px}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<header class="top">
+  <a href="index.html">← UtsavSandesh Home</a>
+  <a href="wish.html">Festival Wishes →</a>
+</header>
+
+<section class="hero">
+  <div>💬 COMMUNITY FEEDBACK</div>
+  <h1>आपका Feedback हमारे लिए महत्वपूर्ण है</h1>
+  <p>Website कैसी लगी? अपना अनुभव और सुझाव साझा करें।</p>
+</section>
+
+<section class="card">
+  <h2>⭐ Share Your Experience</h2>
+
+  <form id="feedbackForm">
+    <label>आपकी Rating *</label>
+
+    <div class="stars" id="stars">
+      <button type="button" data-rating="1" aria-label="1 star">★</button>
+      <button type="button" data-rating="2" aria-label="2 stars">★</button>
+      <button type="button" data-rating="3" aria-label="3 stars">★</button>
+      <button type="button" data-rating="4" aria-label="4 stars">★</button>
+      <button type="button" data-rating="5" aria-label="5 stars">★</button>
+    </div>
+
+    <input type="hidden" id="rating" value="0">
+
+    <label for="name">आपका नाम (Optional)</label>
+    <input id="name" maxlength="60"
+           placeholder="Anonymous">
+
+    <label for="message">Website कैसी लगी? *</label>
+    <textarea id="message" minlength="3" maxlength="1000"
+      required placeholder="अपना अनुभव लिखें..."></textarea>
+
+    <label for="suggestion">आप क्या नया चाहते हैं?</label>
+    <textarea id="suggestion" maxlength="1000"
+      placeholder="कोई feature या सुधार का सुझाव..."></textarea>
+
+    <!-- Honeypot spam protection -->
+    <div style="position:absolute;left:-9999px" aria-hidden="true">
+      <label>Website</label>
+      <input id="website" tabindex="-1" autocomplete="off">
+    </div>
+
+    <button class="submit" id="submitBtn" type="submit">
+      Submit Feedback
+    </button>
+
+    <div id="status" role="status"></div>
+  </form>
+</section>
+
+<section class="card">
+  <div class="review-head">
+    <h2>💖 Visitor Reviews</h2>
+    <div id="ratingSummary">Loading...</div>
+  </div>
+
+  <p class="muted">Approved reviews from our visitors</p>
+  <div id="reviews">Loading reviews...</div>
+</section>
+
+</div>
+
+<footer>© 2026 UtsavSandesh</footer>
+
+<script>
+const cfg = window.SUPABASE_CONFIG;
+
+if (!cfg || !cfg.url || !cfg.key) {
+  document.getElementById("status").textContent =
+    "Supabase configuration missing.";
+  throw new Error("Supabase config missing");
+}
+
+const sb = window.supabase.createClient(cfg.url, cfg.key);
+
+let selectedRating = 0;
+
+const starButtons = document.querySelectorAll("#stars button");
+
+starButtons.forEach(button => {
+  button.addEventListener("click", () => {
+    selectedRating = Number(button.dataset.rating);
+    document.getElementById("rating").value = selectedRating;
+
+    starButtons.forEach(star => {
+      star.classList.toggle(
+        "active",
+        Number(star.dataset.rating) <= selectedRating
+      );
+    });
+  });
+});
+
+// Submit feedback
+document.getElementById("feedbackForm")
+.addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const status = document.getElementById("status");
+  const submitBtn = document.getElementById("submitBtn");
+
+  if (document.getElementById("website").value) return;
+
+  if (selectedRating < 1 || selectedRating > 5) {
+    status.textContent = "कृपया rating चुनें।";
+    return;
+  }
+
+  const name = document.getElementById("name").value.trim();
+  const message = document.getElementById("message").value.trim();
+  const suggestion = document.getElementById("suggestion").value.trim();
+
+  if (message.length < 3) {
+    status.textContent = "कम से कम 3 characters लिखें।";
+    return;
+  }
+
+  submitBtn.disabled = true;
+  status.textContent = "Submitting...";
+
+  const { error } = await sb.from("feedback").insert({
+    name: name || "Anonymous",
+    rating: selectedRating,
+    message,
+    suggestion: suggestion || null,
+    approved: false
+  });
+
+  submitBtn.disabled = false;
+
+  if (error) {
+    console.error(error);
+    status.textContent = "Feedback submit नहीं हुआ। कृपया दोबारा प्रयास करें।";
+    return;
+  }
+
+  status.textContent =
+    "🎉 Thank you! आपका feedback approval के बाद दिखाई देगा।";
+
+  document.getElementById("feedbackForm").reset();
+  selectedRating = 0;
+
+  starButtons.forEach(star => star.classList.remove("active"));
+  loadReviews();
+});
+
+// Load approved reviews
+async function loadReviews() {
+  const box = document.getElementById("reviews");
+  const summary = document.getElementById("ratingSummary");
+
+  const { data, error } = await sb
+    .from("feedback")
+    .select("id,name,rating,message,created_at")
+    .eq("approved", true)
+    .order("created_at", { ascending: false })
+    .limit(100);
+
+  if (error) {
+    box.textContent = "Reviews load नहीं हो सके।";
+    console.error(error);
+    return;
+  }
+
+  const reviews = data || [];
+
+  if (!reviews.length) {
+    box.textContent = "अभी कोई approved review नहीं है।";
+    summary.textContent = "No ratings yet";
+    return;
+  }
+
+  const avg = reviews.reduce((sum, item) => sum + item.rating, 0)
+    / reviews.length;
+
+  summary.textContent =
+    "⭐ " + avg.toFixed(1) + " / 5 · " +
+    reviews.length + " reviews";
+
+  box.replaceChildren();
+
+  reviews.forEach(item => {
+    const card = document.createElement("article");
+    card.className = "review";
+
+    const head = document.createElement("div");
+    head.className = "review-head";
+
+    const name = document.createElement("span");
+    name.className = "review-name";
+    name.textContent = item.name || "Anonymous";
+
+    const stars = document.createElement("span");
+    stars.className = "review-stars";
+    stars.textContent = "★".repeat(item.rating) +
+      "☆".repeat(5 - item.rating);
+
+    head.append(name, stars);
+
+    const message = document.createElement("p");
+    message.textContent = item.message;
+
+    const date = document.createElement("div");
+    date.className = "review-date";
+    date.textContent = new Date(item.created_at)
+      .toLocaleDateString("en-IN");
+
+    card.append(head, message, date);
+    box.append(card);
+  });
+}
+
+loadReviews();
+</script>
+</body>
+</html>
