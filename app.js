@@ -981,3 +981,153 @@ function closeWhatsNew() {
 setTimeout(() => {
   whatsNewPopup.classList.add("show");
 }, 1500);
+
+
+/* UTSAVSANDESH FEEDBACK SYSTEM */
+
+const feedbackClient = window.supabase.createClient(
+  window.SUPABASE_CONFIG.url,
+  window.SUPABASE_CONFIG.key
+);
+
+let selectedFeedbackRating = 0;
+
+const ratingButtons =
+  document.querySelectorAll("#ratingStars button");
+
+ratingButtons.forEach(button => {
+  button.addEventListener("click", () => {
+    selectedFeedbackRating = Number(button.dataset.rating);
+
+    document.getElementById("ratingValue").value =
+      selectedFeedbackRating;
+
+    ratingButtons.forEach(star => {
+      star.classList.toggle(
+        "active",
+        Number(star.dataset.rating) <= selectedFeedbackRating
+      );
+    });
+  });
+});
+
+// Submit feedback
+document.getElementById("feedbackForm")
+.addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const status = document.getElementById("feedbackStatus");
+  const submit = document.getElementById("feedbackSubmit");
+
+  if (selectedFeedbackRating < 1) {
+    status.textContent = "⭐ कृपया rating चुनें।";
+    return;
+  }
+
+  const name = document.getElementById("feedbackName")
+    .value.trim();
+
+  const message = document.getElementById("feedbackMessage")
+    .value.trim();
+
+  const suggestion = document.getElementById("feedbackSuggestion")
+    .value.trim();
+
+  submit.disabled = true;
+  status.textContent = "Submitting...";
+
+  const { error } = await feedbackClient
+    .from("feedback")
+    .insert({
+      name: name || "Anonymous",
+      rating: selectedFeedbackRating,
+      message,
+      suggestion: suggestion || null
+    });
+
+  submit.disabled = false;
+
+  if (error) {
+    console.error(error);
+    status.textContent = "Feedback submit नहीं हुआ।";
+    return;
+  }
+
+  status.textContent = "🎉 Thank you! आपका feedback live हो गया।";
+
+  event.target.reset();
+  selectedFeedbackRating = 0;
+
+  ratingButtons.forEach(star => star.classList.remove("active"));
+
+  loadPublicFeedback();
+});
+
+// Load public feedback
+async function loadPublicFeedback() {
+  const reviewsBox = document.getElementById("feedbackReviews");
+
+  const { data, error } = await feedbackClient
+    .from("feedback")
+    .select("id,name,rating,message,created_at")
+    .order("created_at", { ascending: false })
+    .limit(20);
+
+  if (error) {
+    reviewsBox.textContent = "Reviews load नहीं हो सके।";
+    console.error(error);
+    return;
+  }
+
+  const reviews = data || [];
+
+  const average = reviews.length
+    ? reviews.reduce((sum, item) => sum + item.rating, 0)
+      / reviews.length
+    : 0;
+
+  document.getElementById("avgRating").textContent =
+    average.toFixed(1);
+
+  document.getElementById("totalReviews").textContent =
+    reviews.length;
+
+  reviewsBox.replaceChildren();
+
+  if (!reviews.length) {
+    reviewsBox.textContent = "अभी पहला review आप लिख सकते हैं!";
+    return;
+  }
+
+  reviews.forEach(item => {
+    const card = document.createElement("article");
+    card.className = "feedback-review";
+
+    const top = document.createElement("div");
+    top.className = "feedback-review-top";
+
+    const name = document.createElement("span");
+    name.className = "feedback-review-name";
+    name.textContent = item.name || "Anonymous";
+
+    const stars = document.createElement("span");
+    stars.className = "feedback-review-stars";
+    stars.textContent = "★".repeat(item.rating);
+
+    top.append(name, stars);
+
+    const message = document.createElement("p");
+    message.className = "feedback-review-message";
+    message.textContent = item.message;
+
+    const date = document.createElement("div");
+    date.className = "feedback-review-date";
+    date.textContent = new Date(item.created_at)
+      .toLocaleDateString("en-IN");
+
+    card.append(top, message, date);
+    reviewsBox.append(card);
+  });
+}
+
+loadPublicFeedback();
